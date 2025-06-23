@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Video Analysis</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <div id="original-video-container" class="panel">
+            <div class="panel-header">
+                <h4>Original Video</h4>
+            </div>
+            <div class="panel-content">
+                <div id="original-video-display" class="video-display-area">
+                    <div id="upload-box" class="upload-box">
+                        <i class="fas fa-film"></i>
+                        <h3>Drop video to begin</h3>
+                        <input type="file" id="videoFile" name="video" accept="video/*" hidden>
+                        <button class="upload-btn">Select Video</button>
+                    </div>
+                    <!-- Original video player will be injected here -->
+                </div>
+                <div id="timeline-container" class="timeline-container hidden">
+                    <div id="timeline-ruler" class="timeline-ruler">
+                        <div id="timeline-playhead" class="timeline-playhead"></div>
+                        <div id="timeline-segments" class="timeline-segments"></div>
+                    </div>
+                    <div class="time-display">
+                        <span id="current-time">00:00.0</span> / <span id="total-duration">00:00.0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="right-column">
+            <div id="trimmed-video-container" class="panel">
+                <div class="panel-header">
+                    <h4>Trimmed Segment</h4>
+                </div>
+                <div class="panel-content">
+                    <div id="trimmed-video-display" class="video-display-area">
+                        <div class="placeholder">
+                            <i class="fas fa-wand-magic-sparkles"></i>
+                            <p>Trimmed video will appear here after analysis.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="inspector-container" class="panel">
+                <div class="panel-header">
+                    <h4>Analysis</h4>
+                </div>
+                <div class="panel-content">
+                    <form id="queryForm">
+                        <textarea id="query" name="query" placeholder="Ask the AI to find something..." required disabled></textarea>
+                        <button type="submit" id="submit-query-btn" class="submit-btn" disabled>
+                            <i class="fas fa-paper-plane"></i> Analyze
+                        </button>
+                    </form>
+                    <div id="analysis-status-container" class="analysis-status-container">
+                        <!-- Status updates will appear here -->
+                    </div>
+                    <div id="analysis-log" class="analysis-log">
+                        <!-- Log items will be added here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

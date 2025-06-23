@@ -1,0 +1,173 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
+:root {
+    --bg-color-dark: #111827;
+    --bg-color-medium: #1f2937;
+    --bg-color-light: #374151;
+    --border-color: #4b5563;
+    --text-color-primary: #f9fafb;
+    --text-color-secondary: #9ca3af;
+    --accent-color: #3b82f6;
+    --timeline-segment-color: #8b5cf6;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg-color-dark);
+    color: var(--text-color-primary);
+    overflow: hidden;
+}
+
+.app-container {
+    display: flex;
+    height: 100vh;
+    padding: 1rem;
+    gap: 1rem;
+}
+
+#original-video-container {
+    flex: 3;
+    display: flex;
+    flex-direction: column;
+}
+
+.right-column {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.panel {
+    background-color: var(--bg-color-medium);
+    border-radius: 0.5rem;
+    border: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+.panel-header {
+    padding: 0.75rem 1.25rem;
+    border-bottom: 1px solid var(--border-color);
+    flex-shrink: 0;
+}
+.panel-content {
+    padding: 1.25rem;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+}
+.video-display-area {
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #000;
+    border-radius: 0.375rem;
+    min-height: 150px;
+}
+.video-display-area video {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+.placeholder, .upload-box {
+    text-align: center;
+    color: var(--text-color-secondary);
+}
+.upload-btn {
+    margin-top: 1rem;
+    background-color: var(--accent-color);
+    color: white; border: none; padding: 0.6rem 1.2rem;
+    border-radius: 0.375rem; cursor: pointer; font-weight: 500;
+}
+
+/* Timeline */
+#timeline-container {
+    padding-top: 1rem;
+}
+.timeline-ruler {
+    position: relative;
+    background-color: var(--bg-color-light);
+    height: 20px;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    margin-bottom: 0.5rem;
+}
+.timeline-playhead {
+    position: absolute; left: 0; top: 0; bottom: 0;
+    width: 2px; background-color: var(--accent-color); z-index: 2;
+}
+.timeline-segments {
+    position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 1;
+}
+.timeline-segment-marker {
+    position: absolute; top: 0; bottom: 0;
+    background-color: rgba(139, 92, 246, 0.5);
+    border-left: 1px solid var(--timeline-segment-color);
+    border-right: 1px solid var(--timeline-segment-color);
+}
+.time-display {
+    text-align: center; font-size: 0.875rem; color: var(--text-color-secondary);
+}
+
+/* Right Column Panels */
+#trimmed-video-container { flex: 1; }
+#inspector-container { flex: 1; }
+
+#queryForm textarea {
+    width: 100%; height: 60px;
+    background-color: var(--bg-color-dark); border: 1px solid var(--border-color);
+    color: var(--text-color-primary); border-radius: 0.375rem;
+    padding: 0.75rem; margin-bottom: 0.75rem; resize: vertical;
+}
+#queryForm textarea:focus { outline: none; border-color: var(--accent-color); }
+
+.submit-btn {
+    width: 100%; display: flex; align-items: center; justify-content: center;
+    gap: 0.5rem; padding: 0.75rem; background-color: var(--accent-color); color: white;
+    border: none; border-radius: 0.375rem; cursor: pointer; font-weight: 500;
+}
+.submit-btn:disabled {
+    background-color: var(--bg-color-light);
+    cursor: not-allowed; color: var(--text-color-secondary);
+}
+
+#analysis-status-container {
+    margin: 1rem 0;
+    padding: 0.75rem;
+    background-color: var(--bg-color-dark);
+    border-radius: 0.375rem;
+    text-align: center;
+    font-size: 0.875rem;
+    color: var(--text-color-secondary);
+    min-height: 20px;
+}
+.analysis-log {
+    display: flex; flex-direction: column; gap: 0.75rem;
+}
+.log-item {
+    background-color: var(--bg-color-light); padding: 0.75rem;
+    border-radius: 0.375rem; font-size: 0.875rem;
+}
+.log-timestamp {
+    font-weight: 600; color: var(--accent-color);
+}
+.play-segment-btn {
+    margin-top: 0.5rem; padding: 0.25rem 0.5rem;
+    background-color: var(--accent-color); border: none; color: white;
+    border-radius: 0.25rem; cursor: pointer;
+}
+
+.hidden { display: none !important; }
+
+@media (max-width: 1024px) {
+    .app-container { flex-direction: column; }
+}

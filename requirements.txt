@@ -1,0 +1,17 @@
+Flask
+Werkzeug
+google-generativeai
+ffmpeg-python
+Pillow
+python-dotenv
+gunicorn
+boto3
+flask_cors
+opencv-python
+
+
+# Fmpeg installed and accessible from command line
+
+# Windows: Download from https://ffmpeg.org/download.html
+# macOS: brew install ffmpeg
+# Linux: sudo apt install ffmpeg

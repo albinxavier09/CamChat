@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: flask-ffmpeg-app
+    env: python
+    region: oregon
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn -c gunicorn_config.py app:app
+    envVars:
+      - key: AWS_ACCESS_KEY_ID
+        sync: false
+      - key: AWS_SECRET_ACCESS_KEY
+        sync: false
+      - key: AWS_REGION
+        value: ap-east-1
+      - key: GOOGLE_API_KEY
+        sync: false
+      - key: PYTHONUNBUFFERED
+        value: true
+    build:
+      aptDependencies:
+        - ffmpeg
