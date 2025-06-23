@@ -5,7 +5,7 @@ import cv2
 import subprocess
 
 # Configure Gemini AI
-os.environ['GOOGLE_API_KEY'] = 'AIzaSyAYNvTqJCnZ7Ihs4C4KzjF5DE9h3IeXAoY'
+# os.environ['GOOGLE_API_KEY'] = 'AIzaSyAYNvTqJCnZ7Ihs4C4KzjF5DE9h3IeXAoY'  # REMOVE THIS LINE
 genai.configure(api_key=os.getenv('GOOGLE_API_KEY'))
 model = genai.GenerativeModel('gemini-1.5-flash-latest')
 
