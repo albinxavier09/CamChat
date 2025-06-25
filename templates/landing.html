@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClipQuery – AI Video Search & Chat</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Montserrat:wght@700;900&family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/landing.css') }}">
+    <style>
+        body { font-family: 'Inter', Arial, sans-serif; }
+        h1, h2, h3, .gradient-text, .navbar-logo { font-family: 'Press Start 2P', monospace; letter-spacing: 1px; }
+        .navbar-logo { font-size: 1.2rem; }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-content">
+            <span class="navbar-logo">ClipQuery</span>
+            <ul class="navbar-links">
+                <li><a href="#features">Features</a></li>
+                <li><a href="#samples">Samples</a></li>
+                <li><a href="/app">Demo</a></li>
+                <li><a href="#about">About</a></li>
+            </ul>
+        </div>
+    </nav>
+    <div class="landing-hero split-hero">
+        <div class="hero-left">
+            <h1><span class="gradient-text">ClipQuery</span></h1>
+            <p class="hero-desc">AI Video Search & Chat, Instantly</p>
+            <p class="hero-subdesc">Upload your own video or try a sample. Find moments, ask questions, and chat with your videos—powered by next-gen AI.</p>
+            <a href="/app" class="hero-demo-btn">Try Your Own Video <i class="fas fa-arrow-right"></i></a>
+        </div>
+    </div>
+    <section class="features-section" id="features">
+        <div class="features-grid">
+            <div class="feature-card">
+                <i class="fas fa-search fa-2x"></i>
+                <h3>Semantic Video Search</h3>
+                <p>Find any moment in your video using natural language queries. No more scrubbing through hours of footage.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-comments fa-2x"></i>
+                <h3>Chat with Your Video</h3>
+                <p>Ask questions and get instant answers as if your video could talk. ClipQuery makes your footage interactive.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-bolt fa-2x"></i>
+                <h3>Lightning Fast</h3>
+                <p>Powered by advanced AI, ClipQuery delivers results in seconds, even for long videos.</p>
+            </div>
+        </div>
+    </section>
+    <section class="samples-section" id="samples">
+        <h2>Try a Sample Video</h2>
+        <div class="samples-grid">
+            <div class="sample-card">
+                <video src="{{ request.url_root.rstrip('/') }}/static/sample_videos/sample1.mp4" controls></video>
+                <div class="sample-info">
+                    <h3>sample1.mp4</h3>
+                    <p>Test with this sample video. See how ClipQuery analyzes and chats with your footage.</p>
+                    <a href="/app?sample=sample1.mp4" class="sample-demo-btn">Demo <i class="fas fa-play"></i></a>
+                </div>
+            </div>
+            <div class="sample-card">
+                <video src="{{ request.url_root.rstrip('/') }}/static/sample_videos/sample2.mp4" controls></video>
+                <div class="sample-info">
+                    <h3>sample2.mp4</h3>
+                    <p>Try another example video. Ask questions and find moments instantly.</p>
+                    <a href="/app?sample=sample2.mp4" class="sample-demo-btn">Demo <i class="fas fa-play"></i></a>
+                </div>
+            </div>
+            <div class="sample-card">
+                <video src="{{ request.url_root.rstrip('/') }}/static/sample_videos/sample3.mp4" controls></video>
+                <div class="sample-info">
+                    <h3>sample3.mp4</h3>
+                    <p>Explore this sample. Discover how AI can search and chat with your video.</p>
+                    <a href="/app?sample=sample3.mp4" class="sample-demo-btn">Demo <i class="fas fa-play"></i></a>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Remove the footer watermark -->
+    <!-- <footer class="landing-footer" id="about">
+        <span>Made with <i class="fas fa-bolt"></i> by the ClipQuery Team</span>
+    </footer> -->
+</body>
+</html> 

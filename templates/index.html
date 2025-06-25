@@ -22,7 +22,7 @@
                         <button class="upload-btn">Select Video</button>
                     </div>
                     <!-- Original video player will be injected here -->
-                </div>
+                    </div>
                 <div id="timeline-container" class="timeline-container hidden">
                     <div id="timeline-ruler" class="timeline-ruler">
                         <div id="timeline-playhead" class="timeline-playhead"></div>
@@ -33,13 +33,13 @@
                     </div>
                 </div>
             </div>
-        </div>
+                    </div>
 
         <div class="right-column">
             <div id="trimmed-video-container" class="panel">
                 <div class="panel-header">
                     <h4>Trimmed Segment</h4>
-                </div>
+                                </div>
                 <div class="panel-content">
                     <div id="trimmed-video-display" class="video-display-area">
                         <div class="placeholder">
@@ -51,20 +51,45 @@
             </div>
             <div id="inspector-container" class="panel">
                 <div class="panel-header">
-                    <h4>Analysis</h4>
+                    <h4>Analysis & Chat</h4>
+                    <div class="tab-buttons">
+                        <button class="tab-btn active" data-tab="analysis">Analysis</button>
+                        <button class="tab-btn" data-tab="chat">Chat with Video</button>
+                    </div>
                 </div>
                 <div class="panel-content">
-                    <form id="queryForm">
-                        <textarea id="query" name="query" placeholder="Ask the AI to find something..." required disabled></textarea>
-                        <button type="submit" id="submit-query-btn" class="submit-btn" disabled>
-                            <i class="fas fa-paper-plane"></i> Analyze
-                        </button>
-                    </form>
-                    <div id="analysis-status-container" class="analysis-status-container">
-                        <!-- Status updates will appear here -->
+                    <!-- Analysis Tab -->
+                    <div id="analysis-tab" class="tab-content active">
+                        <form id="queryForm">
+                            <textarea id="query" name="query" placeholder="Ask the AI to find something..." required disabled></textarea>
+                            <button type="submit" id="submit-query-btn" class="submit-btn" disabled>
+                                <i class="fas fa-paper-plane"></i> Analyze
+                            </button>
+                        </form>
+                        <div id="analysis-status-container" class="analysis-status-container">
+                            <!-- Status updates will appear here -->
+                        </div>
+                        <div id="analysis-log" class="analysis-log">
+                            <!-- Log items will be added here -->
+                        </div>
                     </div>
-                    <div id="analysis-log" class="analysis-log">
-                        <!-- Log items will be added here -->
+                    
+                    <!-- Chat Tab -->
+                    <div id="chat-tab" class="tab-content">
+                        <div id="chat-messages" class="chat-messages">
+                            <div class="chat-welcome">
+                                <i class="fas fa-comments"></i>
+                                <p>Start a conversation with your video! Ask questions, get descriptions, or just chat about what you see.</p>
+                            </div>
+                        </div>
+                        <form id="chatForm" class="chat-form">
+                            <div class="chat-input-container">
+                                <textarea id="chatInput" placeholder="Type your message to the video..." disabled></textarea>
+                                <button type="submit" id="send-chat-btn" class="send-btn" disabled>
+                                    <i class="fas fa-paper-plane"></i>
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -72,5 +97,47 @@
     </div>
 
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% if sample %}
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Show a demo banner
+        const banner = document.createElement('div');
+        banner.className = 'demo-banner';
+        banner.innerHTML = `<i class='fas fa-play-circle'></i> Demo: Sample video loaded. <a href='/app' style='color:#fff;text-decoration:underline;margin-left:1em;'>Upload your own</a>`;
+        document.body.prepend(banner);
+
+        // Auto-load the sample video
+        const videoFileEl = document.getElementById('videoFile');
+        const uploadBox = document.getElementById('upload-box');
+        const sampleUrl = '/static/sample_videos/{{ sample }}';
+        fetch(sampleUrl)
+          .then(res => res.blob())
+          .then(blob => {
+            const file = new File([blob], '{{ sample }}', { type: blob.type });
+            // Simulate file upload
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(file);
+            videoFileEl.files = dataTransfer.files;
+            // Trigger change event
+            videoFileEl.dispatchEvent(new Event('change'));
+          });
+    });
+    </script>
+    <style>
+    .demo-banner {
+        background: linear-gradient(90deg, #00c6ff 0%, #8b5cf6 100%);
+        color: #fff;
+        font-weight: 600;
+        padding: 1rem 0;
+        text-align: center;
+        font-size: 1.1rem;
+        letter-spacing: 1px;
+        box-shadow: 0 2px 16px 0 rgba(139,92,246,0.10);
+        z-index: 1000;
+        position: relative;
+    }
+    .demo-banner i { margin-right: 0.5em; }
+    </style>
+    {% endif %}
 </body>
 </html>

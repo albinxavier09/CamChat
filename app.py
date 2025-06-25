@@ -2,7 +2,7 @@ import os
 import time
 import ffmpeg
 import google.generativeai as genai
-from flask import Flask, render_template, request, jsonify, redirect, url_for, send_file
+from flask import Flask, render_template, request, jsonify, redirect, url_for, send_file, send_from_directory
 from werkzeug.utils import secure_filename
 from PIL import Image
 import uuid
@@ -14,6 +14,8 @@ import subprocess
 import sys
 from flask_cors import CORS
 from video_processor import get_video_timestamps, time_str_to_seconds, process_video_with_query_and_extract
+import atexit
+import shutil
 
 # Load environment variables from .env file
 load_dotenv()
@@ -266,9 +268,26 @@ def trim_video(input_path, output_path, start_time, end_time):
         print(f"Error trimming video: {str(e)}")
         return False
 
+def cleanup_temp_folders():
+    print("Cleaning up temp_uploads and temp_outputs folders...")
+    try:
+        shutil.rmtree(TEMP_UPLOAD_FOLDER, ignore_errors=True)
+        shutil.rmtree(TEMP_OUTPUT_FOLDER, ignore_errors=True)
+        os.makedirs(TEMP_UPLOAD_FOLDER, exist_ok=True)
+        os.makedirs(TEMP_OUTPUT_FOLDER, exist_ok=True)
+    except Exception as e:
+        print(f"Error cleaning up temp folders: {e}")
+
+atexit.register(cleanup_temp_folders)
+
 @app.route('/')
-def index():
-    return render_template('index.html')
+def landing():
+    return render_template('landing.html')
+
+@app.route('/app')
+def app_main():
+    sample = request.args.get('sample')
+    return render_template('index.html', sample=sample)
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
@@ -308,7 +327,6 @@ def upload_file():
                 image_filename = f"{unique_id}_{secure_filename(image_file.filename)}"
                 temp_image_path = os.path.join(TEMP_UPLOAD_FOLDER, image_filename)
                 image_file.save(temp_image_path)
-                
                 s3_image_key = f"{S3_VIDEO_PREFIX}{image_filename}"
                 # upload_file_to_s3(temp_image_path, s3_image_key)  # Commented out for local development
                 image_path = temp_image_path
@@ -337,7 +355,7 @@ def process_video_endpoint():
 
     if video_file.filename == '':
         return jsonify({"error": "No selected file"}), 400
-
+        
     # Save the uploaded video file temporarily
     filename = secure_filename(video_file.filename)
     temp_video_path = os.path.join("temp_uploads", f"{uuid.uuid4()}_{filename}")
@@ -375,7 +393,7 @@ def process_video_endpoint():
                 "found": False,
                 "message": "Could not find the requested segment in the video."
             }), 200
-
+    
     except Exception as e:
         print(f"Error during video processing: {e}")
         return jsonify({"error": "An internal error occurred during processing."}), 500
@@ -404,14 +422,91 @@ def download_file(filename):
             return send_file(file_path, as_attachment=True)
         else:
             return jsonify({'error': 'File not found'}), 404
+    else:
+        # Original S3 redirect code (commented out)
+        # s3_key = f"{S3_OUTPUT_PREFIX}{filename}"
+        # url = get_s3_url(s3_key)
+        # if url:
+        #     return redirect(url)
+        # else:
+        #     return jsonify({'error': 'Failed to generate video URL'}), 404
+        return jsonify({'error': 'S3 not configured'}), 404
+
+@app.route('/api/chat', methods=['POST'])
+def chat_with_video():
+    """Chat with the video using it as a knowledge source"""
+    try:
+        if 'video' not in request.files:
+            return jsonify({'error': 'No video file provided'}), 400
+        
+        video_file = request.files['video']
+        message = request.form.get('message')
+        
+        if not message:
+            return jsonify({'error': 'No message provided'}), 400
+        
+        if video_file.filename == '':
+            return jsonify({'error': 'No video file selected'}), 400
+        
+        # Save the video file temporarily
+        filename = secure_filename(video_file.filename)
+        temp_video_path = os.path.join(TEMP_UPLOAD_FOLDER, f"{uuid.uuid4()}_{filename}")
+        video_file.save(temp_video_path)
+        
+        try:
+            # Upload video to Gemini
+            print("Uploading video for chat...")
+            gemini_video_file = genai.upload_file(path=temp_video_path)
+            
+            while gemini_video_file.state.name == "PROCESSING":
+                print("Waiting for AI to process the video for chat...")
+                time.sleep(10)
+                gemini_video_file = genai.get_file(gemini_video_file.name)
+            
+            if gemini_video_file.state.name == "FAILED":
+                return jsonify({'error': 'AI failed to process the video'}), 500
+            
+            # Create chat prompt
+            chat_prompt = f"""You are the video itself. You have been uploaded as a video file and can see and understand everything that happens in the video.
+
+The user is chatting with you as if you ARE the video. Respond to their questions and comments as if you are the video speaking to them.
+
+User message: {message}
+
+Respond naturally as if you are the video having a conversation with the user. Be engaging, informative, and conversational. You can describe what you see, answer questions about your content, and interact with the user as if you are the video itself."""
+            
+            # Generate response
+            response = model.generate_content([gemini_video_file, chat_prompt])
+            
+            return jsonify({
+                'response': response.text,
+                'timestamp': time.time()
+            })
+            
+        finally:
+            # Clean up the temporary video file
+            if os.path.exists(temp_video_path):
+                try:
+                    os.remove(temp_video_path)
+                except Exception as e:
+                    print(f"Warning: Could not delete temp chat video {temp_video_path}: {e}")
     
-    # Original S3 redirect code (commented out)
-    # s3_key = f"{S3_OUTPUT_PREFIX}{filename}"
-    # url = get_s3_url(s3_key)
-    # if url:
-    #     return redirect(url)
-    # else:
-    #     return jsonify({'error': 'Failed to generate video URL'}), 404
+    except Exception as e:
+        print(f"Error in chat endpoint: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/cleanup-temp', methods=['POST'])
+def cleanup_temp():
+    try:
+        data = request.get_json()
+        temp_video_path = data.get('temp_video_path')
+        if temp_video_path and os.path.exists(temp_video_path):
+            os.remove(temp_video_path)
+            print(f"Temp file {temp_video_path} deleted on tab close.")
+        return '', 204
+    except Exception as e:
+        print(f"Cleanup error: {e}")
+        return '', 500
 
 if __name__ == "__main__":
     import os
